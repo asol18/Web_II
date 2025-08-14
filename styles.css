@@ -1,0 +1,191 @@
+Styles
+
+/* Variables CSS (ya deberían estar en tu style.css) */
+:root {
+    --limon-dulce-verde-claro: #adff2f;
+    /* Tu verde limón principal */
+    --limon-dulce-verde-oscuro: #306C00;
+    /* Un ejemplo de verde más oscuro */
+    --limon-dulce-amarillo-pastel: #FFFACD;
+    /* Un ejemplo de amarillo pastel */
+    --limon-dulce-gris-claro: #f8f9fa;
+    /* Color de fondo claro de Bootstrap */
+    --limon-dulce-gris-oscuro: #343a40;
+    /* Color de fondo oscuro de Bootstrap */
+}
+
+/* (El resto de tus estilos existentes para navbar, botones, footer, etc.) */
+/* Estilos index */
+.btn-success {
+    background-color: yellowgreen;
+    border-color: yellowgreen;
+}
+
+.custom-navbar {
+    background-color: #F7F7F7 !important;
+    /* gris más oscuro que bg-light */
+}
+
+.card-text {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.info-section {
+    background-color: #F7F7F7 !important;
+    /* gris más oscuro que bg-light */
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.info-section h5 {
+    text-align: center;
+}
+
+.info-section p {
+    text-align: center;
+}
+
+.mt-auto {
+    background-color: #23A321;
+    border-color: #23A321;
+}
+
+.custom-footer {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.contact-info img {
+    width: 50px;
+    /* Ajusta el tamaño de las imágenes de contacto */
+    height: 50px;
+    /* Ajusta el tamaño de las imágenes de contacto */
+    margin-right: 10px;
+    /* Espacio entre la imagen y el texto */
+}
+
+.info-box img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
+/* Fin estilos index */
+
+/* Estilos login */
+body {
+    background-color: var(--limon-dulce-gris-claro);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.form-signin {
+    width: 100%;
+    max-width: 400px;
+    /* Ancho máximo del formulario */
+    padding: 15px;
+    margin: auto;
+    /* Centra el formulario */
+}
+
+.form-signin .form-floating:focus-within {
+    z-index: 2;
+}
+
+.form-signin input[type="email"] {
+    margin-bottom: -1px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.form-signin input[type="password"] {
+    margin-bottom: 10px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.login-card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+/* Fin estilos login */
+
+/* Estilos para las tarjetas de producto en la lista y relacionados */
+.product-card {
+    border: 1px solid var(--limon-dulce-amarillo-pastel);
+    transition: transform 0.2s ease-in-out;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
+}
+
+.product-card .card-title {
+    color: var(--limon-dulce-verde-oscuro);
+}
+
+.product-card .fw-bold {
+    /* Estilo para el precio */
+    color: var(--limon-dulce-verde-oscuro);
+    font-size: 1.25rem;
+}
+
+/* Estilos para la página de detalle de producto */
+.price-text {
+    color: var(--limon-dulce-verde-claro);
+    font-size: 2rem;
+}
+
+.thumbnail {
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.thumbnail:hover,
+.thumbnail.active {
+    border-color: var(--limon-dulce-verde-claro);
+}
+
+/* Estilos para las tarjetas de carrito */
+.cart-item-card {
+    border: 1px solid var(--limon-dulce-amarillo-pastel);
+}
+
+/* Estilos para el encabezado del resumen del pedido */
+.custom-card-header {
+    background-color: var(--limon-dulce-verde-oscuro) !important;
+    border-bottom: 1px solid var(--limon-dulce-verde-claro);
+}
+
+/* Estilos para el texto de enlaces de primary en formularios de login/registro */
+.text-primary {
+    color: var(--limon-dulce-verde-oscuro) !important;
+}
+
+.text-primary:hover {
+    color: var(--limon-dulce-verde-claro) !important;
+}
+
+/* Estilos para la navegación de perfil (tabs) */
+.profile-nav-tabs .list-group-item-action {
+    color: var(--limon-dulce-verde-oscuro);
+    border-color: var(--limon-dulce-amarillo-pastel);
+}
+
+.profile-nav-tabs .list-group-item-action.active {
+    background-color: var(--limon-dulce-verde-claro) !important;
+    border-color: var(--limon-dulce-verde-claro) !important;
+    color: var(--limon-dulce-verde-oscuro) !important;
+}
+
+.profile-nav-tabs .list-group-item-action:hover {
+    background-color: var(--limon-dulce-amarillo-pastel);
+}
+
+/* Estilo para el encabezado de la tabla de historial de pedidos */
+.custom-table-header {
+    background-color: var(--limon-dulce-verde-oscuro) !important;
+    color: var(--limon-dulce-amarillo-pastel) !important;
+}
