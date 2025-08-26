@@ -1,3 +1,34 @@
+<?php
+session_start();
+require_once 'conexion.php'; // Asegúrate de que este archivo exista y funcione.
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $correo = $_POST['correo'];
+    $contrasena = $_POST['contraseña'];
+
+    // Aquí deberías validar las credenciales con la base de datos
+    $stmt = $mysqli->prepare("SELECT id, nombre, contraseña FROM usuarios WHERE correo = ?");
+    $stmt->bind_param("s", $correo);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 1) {
+        $user = $result->fetch_assoc();
+        if (password_verify($contrasena, $user['contraseña'])) {
+            // Credenciales válidas
+            $_SESSION['usuario_id'] = $user['id'];
+            $_SESSION['usuario_nombre'] = $user['nombre'];
+            header("Location: perfil.php");
+            exit;
+        } else {
+            $error = "Contraseña incorrecta.";
+        }
+    } else {
+        $error = "No se encontró una cuenta con ese correo electrónico.";
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -45,13 +76,13 @@
                 <img class="mb-4" src="img/Logo.png" alt="Limón Dulce Logo" width="100">
                 <h1 class="h3 mb-3 fw-normal section-title">Inicia Sesión</h1>
 
-                <form action="tu_script_php_login.php" method="POST">
+                <form action="" method="POST">
                     <div class="form-floating mb-3">
-                        <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" required>
+                        <input type="email" class="form-control" id="floatingInput" name="correo" placeholder="correo" required>
                         <label for="floatingInput">Correo electrónico</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="password" class="form-control" id="floatingPassword" placeholder="Contraseña" required>
+                        <input type="password" class="form-control" id="floatingPassword" name="contraseña" placeholder="Contraseña" required>
                         <label for="floatingPassword">Contraseña</label>
                     </div>
 

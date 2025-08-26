@@ -45,20 +45,20 @@
         <p class="lead text-center mb-5">Encuentra el estilo perfecto para cada ocasión.</p>
                 <div class="row mb-4">
             <div class="col-md-12">
-                <form class="d-flex justify-content-center">
-                    <input class="form-control me-2 w-50" type="search" placeholder="Buscar productos..." aria-label="Search">
-                    <select class="form-select me-2 w-auto" aria-label="Filtrar por categoría">
+                <form class="d-flex justify-content-center" action="catalogo.php" method="GET">
+                    <input class="form-control me-2 w-50" type="search" placeholder="Buscar productos..." aria-label="Search" name="busqueda">
+                    <select class="form-select me-2 w-auto" aria-label="Filtrar por categoría" name="categoria">
                         <option selected>Categoría</option>
-                        <option value="1">Blusas</option>
-                        <option value="2">Abrigos</option>
-                        <option value="3">Conjuntos</option>
-                        <option value="4">Enaguas</option>
-                        <option value="5">Enterizos</option>
-                        <option value="6">Pantalones</option>
-                        <option value="7">Shorts</option>
-                        <option value="8">Vestidos</option>
-                        <option value="9">Zapatos</option>
-                        <option value="10">Chalecos</option>
+                        <option value="blusas">Blusas</option>
+                        <option value="abrigos">Abrigos</option>
+                        <option value="conjuntos">Conjuntos</option>
+                        <option value="enaguas">Enaguas</option>
+                        <option value="enterizos">Enterizos</option>
+                        <option value="pantalones">Pantalones</option>
+                        <option value="shorts">Shorts</option>
+                        <option value="vestidos">Vestidos</option>
+                        <option value="zapatos">Zapatos</option>
+                        <option value="chalecos">Chalecos</option>
                     </select>
                     <button class="btn btn-outline-primary" type="submit">Filtrar</button>
                 </form>

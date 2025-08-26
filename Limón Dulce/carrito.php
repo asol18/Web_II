@@ -1,19 +1,14 @@
 <?php
 session_start();
+require_once 'conexion.php'; 
 
-// Función para formatear el precio en Colón Costarricense (CRC)
-// Esto asume que el valor de $price ya es un float o un número
+// --- FUNCIONES DE FORMATO Y CÁLCULO DE PRECIOS ---
+// Mantén tus funciones para el formato de moneda y para convertir a float.
 function formatPriceCRC($price) {
-    // number_format(número, decimales, separador_decimal, separador_miles)
-    return '₡ ' . number_format($price, 2, ',', '.'); // Formato tico: coma para decimales, punto para miles
+    return '₡ ' . number_format($price, 2, ',', '.');
 }
 
-// Aunque tu función parse_price_to_float es buena,
-// si los precios vienen directamente de la DB o ya se procesaron a float al agregar al carrito,
-// es posible que no la necesites para CADA iteración aquí.
-// Pero la dejaremos si hay alguna posibilidad de que el precio en la sesión no sea un float puro.
-function parse_price_to_float_updated($s)
-{
+function parse_price_to_float_updated($s) {
     if (!is_string($s) && !is_numeric($s)) return 0.0;
     $s = trim((string)$s);
     $lastDot = strrpos($s, '.');
@@ -21,29 +16,24 @@ function parse_price_to_float_updated($s)
 
     if ($lastDot !== false && $lastComma !== false) {
         if ($lastComma > $lastDot) {
-            $s = str_replace('.', '', $s); // Remove thousands separator
-            $s = str_replace(',', '.', $s); // Replace decimal comma with dot
+            $s = str_replace('.', '', $s);
+            $s = str_replace(',', '.', $s);
         } else {
-            $s = str_replace(',', '', $s); // Remove thousands comma
+            $s = str_replace(',', '', $s);
         }
     } else {
         if ($lastComma !== false) {
-            // Check if it's a thousands separator or a decimal comma
             $parts = explode(',', $s);
             $lastPart = end($parts);
             if (strlen($lastPart) == 3 && count($parts) > 1) {
-                // If the last part has 3 digits and there are multiple parts, assume comma is thousands separator
                 $s = str_replace(',', '', $s);
             } else {
-                // Otherwise, assume comma is decimal separator
                 $s = str_replace(',', '.', $s);
             }
         } elseif ($lastDot !== false) {
-            // Check if it's a thousands separator or a decimal dot
             $parts = explode('.', $s);
             $lastPart = end($parts);
             if (strlen($lastPart) == 3 && count($parts) > 1) {
-                // If the last part has 3 digits and there are multiple parts, assume dot is thousands separator
                 $s = str_replace('.', '', $s);
             }
         }
@@ -51,38 +41,70 @@ function parse_price_to_float_updated($s)
     return floatval($s);
 }
 
+// Inicializa el carrito si no existe
+if (!isset($_SESSION['carrito'])) {
+    $_SESSION['carrito'] = [];
+}
 
+// --- LÓGICA DE GESTIÓN DEL CARRITO ---
+// Lógica para agregar un producto
+if (isset($_GET['action']) && $_GET['action'] == 'add' && isset($_GET['id'])) {
+    $id_producto = $_GET['id'];
+
+    if (isset($_SESSION['carrito'][$id_producto])) {
+        $_SESSION['carrito'][$id_producto]['cantidad']++;
+    } else {
+        $sql = "SELECT id, nombre, precio, imagen FROM productos WHERE id = ?";
+        $stmt = $mysqli->prepare($sql);
+        $stmt->bind_param("i", $id_producto);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $producto = $result->fetch_assoc();
+            $_SESSION['carrito'][$id_producto] = [
+                'id' => $producto['id'],
+                'nombre' => $producto['nombre'],
+                'precio' => $producto['precio'],
+                'imagen' => $producto['imagen'],
+                'cantidad' => 1
+            ];
+        }
+    }
+    header('Location: carrito.php');
+    exit;
+}
+
+// Lógica para vaciar el carrito
+if (isset($_GET['action']) && $_GET['action'] == 'vaciar') {
+    unset($_SESSION['carrito']);
+    $_SESSION['carrito'] = [];
+    header('Location: carrito.php');
+    exit;
+}
+
+// --- CÁLCULO DE TOTALES ---
+// Esto es lo que tenías, pero integrado después de la lógica del carrito
 $carrito = $_SESSION['carrito'] ?? [];
 $subtotal = 0.0;
 
-// Recalcular el subtotal basado en los ítems del carrito
 foreach ($carrito as $id => $item) {
-    // Asegúrate de que $item['precio'] es un número antes de usarlo.
-    // Usaremos tu función parse_price_to_float_updated por seguridad,
-    // pero idealmente $item['precio'] ya debería ser un float.
     $precio = parse_price_to_float_updated($item['precio']);
     $cantidad = isset($item['cantidad']) ? intval($item['cantidad']) : 1;
-
-    // Asegúrate de que la cantidad no sea menor que 1
     if ($cantidad < 1) {
         $cantidad = 1;
-        // Opcional: podrías querer actualizar la sesión aquí si la cantidad se modificó
-        $_SESSION['carrito'][$id]['cantidad'] = 1;
     }
-
     $subtotal += $precio * $cantidad;
 }
 
 // Impuesto del 13% para Costa Rica (IVA)
 $impuesto = $subtotal * 0.13;
-// Costo de envío (ejemplo, puede ser dinámico en el futuro)
 $envio = 2000.00; // Costo de envío en CRC
 $total = $subtotal + $impuesto + $envio;
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -91,9 +113,7 @@ $total = $subtotal + $impuesto + $envio;
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-
     <nav class="navbar navbar-expand-lg navbar-light bg-light custom-navbar">
         <div class="container-fluid">
             <a class="navbar-brand" href="index.php">
@@ -121,10 +141,8 @@ $total = $subtotal + $impuesto + $envio;
             </div>
         </div>
     </nav>
-
     <main class="container my-5">
         <h2 class="text-center mb-4 section-title">Tu Carrito de Compras</h2>
-
         <div class="row">
             <div class="col-lg-8">
                 <?php if (empty($carrito)) : ?>
@@ -140,7 +158,7 @@ $total = $subtotal + $impuesto + $envio;
                         <div class="card mb-3 shadow-sm cart-item-card">
                             <div class="row g-0 align-items-center">
                                 <div class="col-md-3">
-                                    <img src="<?php echo htmlspecialchars($item['imagen_url'] ?? 'placeholder.jpg'); ?>" class="img-fluid rounded-start" alt="<?php echo htmlspecialchars($item['nombre'] ?? 'Producto'); ?>">
+                                    <img src="img/<?php echo htmlspecialchars($item['imagen']); ?>" alt="<?php echo htmlspecialchars($item['nombre']); ?>" style="width: 80px; height: auto;">
                                 </div>
                                 <div class="col-md-9">
                                     <div class="card-body">
@@ -169,7 +187,6 @@ $total = $subtotal + $impuesto + $envio;
                     <?php endforeach; ?>
                 <?php endif; ?>
             </div>
-
             <div class="col-lg-4">
                 <div class="card shadow-sm">
                     <div class="card-header bg-primary text-white custom-card-header">
@@ -198,7 +215,7 @@ $total = $subtotal + $impuesto + $envio;
                             <?php if (!empty($carrito)) : ?>
                                 <a href="checkout.php" class="btn btn-primary btn-lg">Proceder al Pago <i class="bi bi-arrow-right-circle"></i></a>
                             <?php else : ?>
-                                <button class="btn btn-primary btn-lg" disabled>Proceder al Pago</button>
+                                <button class="btn btn-primary btn-lg">Proceder al Pago</button>
                             <?php endif; ?>
                         </div>
                         <div class="d-grid mt-2">

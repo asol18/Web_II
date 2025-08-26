@@ -1,3 +1,59 @@
+<?php
+session_start();
+require_once 'conexion.php'; 
+
+$error_message = '';
+$success_message = '';
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // 1. Obtener y sanear los datos del formulario
+    $nombre = trim($_POST['nombre'] ?? '');
+    $correo = trim($_POST['correo'] ?? '');
+    $telefono = trim($_POST['telefono'] ?? '');
+    $direccion = trim($_POST['direccion'] ?? '');
+    $contraseña = $_POST['contraseña'] ?? '';
+
+    // 2. Validar que los campos no estén vacíos
+    if (empty($nombre) || empty($correo) || empty($telefono) || empty($direccion) || empty($contraseña)) {
+        $error_message = "Por favor, completa todos los campos.";
+    } elseif (strlen($contraseña) < 6) {
+        $error_message = "La contraseña debe tener al menos 6 caracteres.";
+    } else {
+        // Verifica si el correo ya existe en la base de datos
+        $sql_check_email = "SELECT id FROM usuarios WHERE correo = ?";
+        $stmt_check_email = $mysqli->prepare($sql_check_email);
+        $stmt_check_email->bind_param("s", $correo);
+        $stmt_check_email->execute();
+        $result_check_email = $stmt_check_email->get_result();
+        
+        if ($result_check_email->num_rows > 0) {
+            $error_message = "Este correo electrónico ya está registrado.";
+        } else {
+            // Hashear la contraseña para almacenarla de forma segura
+            $hashed_password = password_hash($contraseña, PASSWORD_DEFAULT);
+            
+            // Inserta el nuevo usuario en la base de datos
+            $sql_insert = "INSERT INTO usuarios (nombre, correo, telefono, direccion, contraseña) VALUES (?, ?, ?, ?, ?)";
+            $stmt_insert = $mysqli->prepare($sql_insert);
+            $stmt_insert->bind_param("sssss", $nombre, $correo, $telefono, $direccion, $hashed_password);
+
+            if ($stmt_insert->execute()) {
+                $success_message = "¡Registro exitoso! Ahora puedes iniciar sesión.";
+                
+                // Iniciar sesión automáticamente al usuario
+                $_SESSION['usuario_id'] = $mysqli->insert_id;
+                $_SESSION['usuario_nombre'] = $nombre;
+                
+                // Redirige al usuario
+                header("Location: perfil.php");
+                exit;
+            } else {
+                $error_message = "Hubo un error al registrar al usuario. Por favor, inténtalo de nuevo.";
+            }
+        }
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -45,32 +101,27 @@
                 <img class="mb-4" src="img/Logo.png" alt="Limón Dulce Logo" width="100">
                 <h1 class="h3 mb-3 fw-normal section-title">Crea tu Cuenta</h1>
 
-                <form action="tu_script_php_registro.php" method="POST">
+                <form action="" method="POST">
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="floatingName" placeholder="nombre" required>
+                        <input type="text" class="form-control" id="floatingName" name="nombre" placeholder="nombre" required>
                         <label for="floatingName">Nombre completo</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="email" class="form-control" id="floatingEmail" placeholder="correo" required>
+                        <input type="email" class="form-control" id="floatingEmail" name="correo" placeholder="correo" required>
                         <label for="floatingEmail">Correo electrónico</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="floatingPhone" placeholder="telefono" required>
+                        <input type="text" class="form-control" id="floatingPhone" name="telefono" placeholder="telefono" required>
                         <label for="floatingPhone">Número de teléfono</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="floatingAddress" placeholder="direccion" required>
+                        <input type="text" class="form-control" id="floatingAddress" name="direccion" placeholder="direccion" required>
                         <label for="floatingAddress">Dirección</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="password" class="form-control" id="floatingPassword" placeholder="Contraseña" required>
+                        <input type="password" class="form-control" id="floatingPassword" name="contraseña" placeholder="Contraseña" required>
                         <label for="floatingPassword">Contraseña</label>
                     </div>
-                    <div class="form-floating mb-3">
-                        <input type="password" class="form-control" id="floatingConfirmPassword" placeholder="Confirmar contraseña" required>
-                        <label for="floatingConfirmPassword">Confirmar contraseña</label>
-                    </div>
-
                     <button class="w-100 btn btn-lg btn-primary mt-auto" type="submit">Registrarse</button>
                     <p class="mt-3 mb-0">¿Ya tienes una cuenta? <a href="inicioSesion.php" class="text-primary">Inicia Sesión</a></p>
                 </form>
