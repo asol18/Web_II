@@ -27,6 +27,9 @@ $result = $stmt->get_result();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo - <?php echo htmlspecialchars(ucfirst($categoria)); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="styles.css">
     <style>
         .card-img-top {
             width: 100%;
@@ -36,6 +39,34 @@ $result = $stmt->get_result();
     </style>
 </head>
 <body>
+        <nav class="navbar navbar-expand-lg navbar-light bg-secondary custom-navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="img/Logo.png" alt="Limón Dulce Logo" width="130px" class="d-inline-block align-text-top">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="btn btn-success me-2" href="inicioSesion.php">Iniciar Sesión</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="perfil.php">
+                            <i class="bi bi-person"></i> Perfil
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="carrito.php">
+                            <i class="bi bi-cart"></i> Carrito
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
     <div class="container mt-5">
         <h1 class="text-center mb-4">Catálogo de <?php echo htmlspecialchars(ucfirst($categoria)); ?></h1>
@@ -68,7 +99,50 @@ $result = $stmt->get_result();
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+     <footer class="custom-footer" style="background-color: #AADD22; color: white;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <img src="img/Logo.png" alt="Limón Dulce Logo" width="130px">
+                    <h5>Limón Dulce</h5>
+                    <p>Vístete de frescura, brilla con estilo</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <div class="contact-info">
+                        <img src="img/deskPhone.svg">
+                    </div>
+                    <div>
+                        <h5>Contacto</h5>
+                        <p>
+                            Limón Dulce Ciudad Quesada <br>
+                            Dirección: Plaza Huetar, Alajuela Ciudad Quesada<br>
+                            Teléfono: +506 2461-1522 / 8529-6326<br>
+                            Email: info@limondulcecq.com
+                        </p>
+                        <p>
+                            Limón Dulce Florencia<br>
+                            Dirección: Centro Comercial Florencia, Alajuela Ciudad Quesada <br>
+                            Teléfono: +506 2461-1832 / 6216-8158<br>
+                            Email: info@limondulce.com
+                        </p>
+                    </div>
+
+                    <div>
+                        <a href="#" class="text-white me-2"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-white me-2"><i class="bi bi-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-3">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p>&copy; 2025 Limón Dulce. Todos los derechos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
 </body>
+
 </html>
 
 <?php

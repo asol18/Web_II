@@ -79,7 +79,7 @@
                     <img src="img/Abrigos.png" class="card-img-top" alt="Abrigos">
                     <div class="card-body text-center d-flex flex-column">
                         <p class="card-text">Protección y estilo en una sola prenda para días fríos.</p>
-                        <a href="#" class="btn btn-primary mt-auto">Ver Más</a>
+                        <a href="catalogo.php?categoria=abrigos" class="btn btn-primary mt-auto">Ver Más</a>
                     </div>
                 </div>
             </div>
@@ -88,7 +88,7 @@
                     <img src="img/Conjuntos.png" class="card-img-top" alt="Conjuntos">
                     <div class="card-body text-center d-flex flex-column">
                         <p class="card-text">Combinaciones listas para lucir impecable sin esfuerzo.</p>
-                        <a href="#" class="btn btn-primary mt-auto">Ver Más</a>
+                        <a href="catalogo.php?categoria=conjuntos" class="btn btn-primary mt-auto">Ver Más</a>
                     </div>
                 </div>
             </div>
@@ -97,7 +97,7 @@
                     <img src="img/Enaguas.png" class="card-img-top" alt="Enaguas">
                     <div class="card-body text-center d-flex flex-column">
                         <p class="card-text">Faldas versátiles que combinan frescura y feminidad para cualquier ocasión.</p>
-                        <a href="#" class="btn btn-primary mt-auto">Ver Más</a>
+                        <a href="catalogo.php?categoria=enaguas" class="btn btn-primary mt-auto">Ver Más</a>
                     </div>
                 </div>
             </div>
@@ -106,7 +106,7 @@
                     <img src="img/Enterizos.png" class="card-img-top" alt="Enterizos">
                     <div class="card-body text-center d-flex flex-column">
                         <p class="card-text">Piezas prácticas que unen comodidad y tendencia.</p>
-                        <a href="#" class="btn btn-primary mt-auto">Ver Más</a>
+                        <a href="catalogo.php?categoria=enterizos" class="btn btn-primary mt-auto">Ver Más</a>
                     </div>
                 </div>
             </div>
@@ -115,7 +115,7 @@
                     <img src="img/Pantalones.png" class="card-img-top" alt="Pantalones">
                     <div class="card-body text-center d-flex flex-column">
                         <p class="card-text">Desde clásicos hasta modernos, el aliado perfecto para cualquier look.</p>
-                        <a href="#" class="btn btn-primary mt-auto">Ver Más</a>
+                        <a href="catalogo.php?categoria=pantalones" class="btn btn-primary mt-auto">Ver Más</a>
                     </div>
                 </div>
             </div>
@@ -124,7 +124,7 @@
                     <img src="img/Shorts.png" class="card-img-top" alt="Shorts">
                     <div class="card-body text-center d-flex flex-column">
                         <p class="card-text">Cómodos y frescos, ideales para días soleados y llenos de energía.</p>
-                        <a href="#" class="btn btn-primary mt-auto">Ver Más</a>
+                        <a href="catalogo.php?categoria=shorts" class="btn btn-primary mt-auto">Ver Más</a>
                     </div>
                 </div>
             </div>
@@ -133,7 +133,7 @@
                     <img src="img/Vestidos.png" class="card-img-top" alt="Vestidos">
                     <div class="card-body text-center d-flex flex-column">
                         <p class="card-text">Prendas únicas que destacan tu elegancia y frescura en cada momento.</p>
-                        <a href="#" class="btn btn-primary mt-auto">Ver Más</a>
+                        <a href="catalogo.php?categoria=vestidos" class="btn btn-primary mt-auto">Ver Más</a>
                     </div>
                 </div>
             </div>
@@ -142,7 +142,7 @@
                     <img src="img/Zapatos.png" class="card-img-top" alt="Zapatos">
                     <div class="card-body text-center d-flex flex-column">
                         <p class="card-text">Calzado que completa tu outfit con estilo y comodidad.</p>
-                        <a href="#" class="btn btn-primary mt-auto">Ver Más</a>
+                        <a href="catalogo.php?categoria=zapatos" class="btn btn-primary mt-auto">Ver Más</a>
                     </div>
                 </div>
             </div>
@@ -151,7 +151,7 @@
                     <img src="img/Chalecos.png" class="card-img-top" alt="Chalecos">
                     <div class="card-body text-center d-flex flex-column">
                         <p class="card-text">La capa extra que aporta personalidad y versatilidad a tu look.</p>
-                        <a href="#" class="btn btn-primary mt-auto">Ver Más</a>
+                        <a href="catalogo.php?categoria=chalecos" class="btn btn-primary mt-auto">Ver Más</a>
                     </div>
                 </div>
             </div>
