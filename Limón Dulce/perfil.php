@@ -80,7 +80,7 @@ if ($result->num_rows > 0) {
                     <a class="list-group-item list-group-item-action active" id="list-profile-list" data-bs-toggle="list" href="#list-profile" role="tab" aria-controls="list-profile">
                         <i class="bi bi-person-circle"></i> Datos Personales
                     </a>
-                    <a class="list-group-item list-group-item-action" id="list-orders-list" data-bs-toggle="list" href="#list-orders" role="tab" aria-controls="list-orders">
+                    <a class="list-group-item list-group-item-action" id="list-orders-list" data-bs-toggle="list" href="pedidosUsuario.php" role="tab" aria-controls="list-orders">
                         <i class="bi bi-box-seam"></i> Mis Pedidos
                     </a>
                     <a class="list-group-item list-group-item-action text-danger" href="cerrarSesion.php">

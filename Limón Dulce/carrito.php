@@ -1,9 +1,8 @@
 <?php
 session_start();
-require_once 'conexion.php'; 
+require_once 'conexion.php';
 
-// --- FUNCIONES DE FORMATO Y CÁLCULO DE PRECIOS ---
-// Mantén tus funciones para el formato de moneda y para convertir a float.
+// --- FUNCIONES AUXILIARES ---
 function formatPriceCRC($price) {
     return '₡ ' . number_format($price, 2, ',', '.');
 }
@@ -41,13 +40,12 @@ function parse_price_to_float_updated($s) {
     return floatval($s);
 }
 
-// Inicializa el carrito si no existe
+// Inicializar carrito
 if (!isset($_SESSION['carrito'])) {
     $_SESSION['carrito'] = [];
 }
 
-// --- LÓGICA DE GESTIÓN DEL CARRITO ---
-// Lógica para agregar un producto
+// Agregar producto
 if (isset($_GET['action']) && $_GET['action'] == 'add' && isset($_GET['id'])) {
     $id_producto = $_GET['id'];
 
@@ -75,31 +73,25 @@ if (isset($_GET['action']) && $_GET['action'] == 'add' && isset($_GET['id'])) {
     exit;
 }
 
-// Lógica para vaciar el carrito
+// Vaciar carrito
 if (isset($_GET['action']) && $_GET['action'] == 'vaciar') {
-    unset($_SESSION['carrito']);
     $_SESSION['carrito'] = [];
     header('Location: carrito.php');
     exit;
 }
 
 // --- CÁLCULO DE TOTALES ---
-// Esto es lo que tenías, pero integrado después de la lógica del carrito
 $carrito = $_SESSION['carrito'] ?? [];
 $subtotal = 0.0;
 
-foreach ($carrito as $id => $item) {
+foreach ($carrito as $item) {
     $precio = parse_price_to_float_updated($item['precio']);
-    $cantidad = isset($item['cantidad']) ? intval($item['cantidad']) : 1;
-    if ($cantidad < 1) {
-        $cantidad = 1;
-    }
+    $cantidad = max(1, intval($item['cantidad'] ?? 1));
     $subtotal += $precio * $cantidad;
 }
 
-// Impuesto del 13% para Costa Rica (IVA)
 $impuesto = $subtotal * 0.13;
-$envio = 2000.00; // Costo de envío en CRC
+$envio = 2000.00;
 $total = $subtotal + $impuesto + $envio;
 ?>
 
@@ -107,19 +99,19 @@ $total = $subtotal + $impuesto + $envio;
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Limón Dulce | Carrito de Compras</title>
+    <title>Carrito de Compras</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light custom-navbar">
+<nav class="navbar navbar-expand-lg navbar-light bg-secondary custom-navbar">
         <div class="container-fluid">
             <a class="navbar-brand" href="index.php">
-                <img src="img/Logo.png" alt="Limón Dulce Logo" width="100" class="d-inline-block align-text-top">
+                <img src="img/Logo.png" alt="Limón Dulce Logo" width="130px" class="d-inline-block align-text-top">
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
@@ -141,93 +133,112 @@ $total = $subtotal + $impuesto + $envio;
             </div>
         </div>
     </nav>
-    <main class="container my-5">
-        <h2 class="text-center mb-4 section-title">Tu Carrito de Compras</h2>
-        <div class="row">
-            <div class="col-lg-8">
-                <?php if (empty($carrito)) : ?>
-                    <div class="alert alert-info text-center" role="alert">
-                        Tu carrito está vacío. ¡Empieza a agregar productos!
-                    </div>
-                <?php else : ?>
-                    <?php foreach ($carrito as $id => $item) :
-                        $precio_unitario = parse_price_to_float_updated($item['precio']);
-                        $cantidad_item = isset($item['cantidad']) ? intval($item['cantidad']) : 1;
-                        $subtotal_item = $precio_unitario * $cantidad_item;
-                    ?>
-                        <div class="card mb-3 shadow-sm cart-item-card">
-                            <div class="row g-0 align-items-center">
-                                <div class="col-md-3">
-                                    <img src="img/<?php echo htmlspecialchars($item['imagen']); ?>" alt="<?php echo htmlspecialchars($item['nombre']); ?>" style="width: 80px; height: auto;">
-                                </div>
-                                <div class="col-md-9">
-                                    <div class="card-body">
-                                        <h5 class="card-title"><?php echo htmlspecialchars($item['nombre'] ?? 'Producto Desconocido'); ?></h5>
-                                        <p class="card-text text-muted">
-                                            <?php echo htmlspecialchars($item['descripcion'] ?? ''); ?>
-                                            <?php echo !empty($item['talla']) ? 'Talla: ' . htmlspecialchars($item['talla']) : ''; ?>
-                                            <?php echo !empty($item['color']) ? 'Color: ' . htmlspecialchars($item['color']) : ''; ?>
-                                        </p>
-                                        <div class="d-flex align-items-center mb-2">
-                                            <label for="qty-<?php echo $id; ?>" class="form-label mb-0 me-2">Cantidad:</label>
-                                            <form action="actualizar_carrito.php" method="post" class="d-flex align-items-center">
-                                                <input type="hidden" name="id_producto" value="<?php echo $id; ?>">
-                                                <input type="number" name="cantidad" id="qty-<?php echo $id; ?>" class="form-control w-25" value="<?php echo $cantidad_item; ?>" min="1" onchange="this.form.submit()">
-                                                <span class="ms-auto fw-bold"><?php echo formatPriceCRC($subtotal_item); ?></span>
-                                            </form>
-                                        </div>
-                                        <form action="eliminar_del_carrito.php" method="post">
-                                            <input type="hidden" name="id_producto" value="<?php echo $id; ?>">
-                                            <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i> Eliminar</button>
-                                        </form>
-                                    </div>
+<main class="container my-5">
+    <h2 class="text-center mb-4">Tu Carrito</h2>
+    <div class="row">
+        <div class="col-lg-8">
+            <?php if (empty($carrito)) : ?>
+                <div class="alert alert-info text-center">Tu carrito está vacío.</div>
+            <?php else : ?>
+                <?php foreach ($carrito as $id => $item): 
+                    $precio = parse_price_to_float_updated($item['precio']);
+                    $cantidad = intval($item['cantidad']);
+                    $subtotal_item = $precio * $cantidad;
+                ?>
+                    <div class="card mb-3 shadow-sm">
+                        <div class="row g-0 align-items-center">
+                            <div class="col-md-3">
+                                <img src="img/<?php echo htmlspecialchars($item['imagen']); ?>" class="img-fluid">
+                            </div>
+                            <div class="col-md-9">
+                                <div class="card-body">
+                                    <h5 class="card-title"><?php echo htmlspecialchars($item['nombre']); ?></h5>
+                                    <form class="d-flex align-items-center actualizar-cantidad-form" data-id="<?php echo $id; ?>">
+                                        <input type="number" class="form-control w-25 cantidad-input" value="<?php echo $cantidad; ?>" min="1">
+                                        <span class="ms-auto fw-bold subtotal-item" id="subtotal-item-<?php echo $id; ?>"><?php echo formatPriceCRC($subtotal_item); ?></span>
+                                    </form>
+                                    <button class="btn btn-danger btn-sm eliminar-producto mt-2" data-id="<?php echo $id; ?>"><i class="bi bi-trash"></i> Eliminar</button>
                                 </div>
                             </div>
                         </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
-            <div class="col-lg-4">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white custom-card-header">
-                        Resumen del Pedido
                     </div>
-                    <div class="card-body">
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Subtotal:
-                                <span><?php echo formatPriceCRC($subtotal); ?></span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Envío:
-                                <span><?php echo formatPriceCRC($envio); ?></span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Impuestos (13% IVA):
-                                <span><?php echo formatPriceCRC($impuesto); ?></span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center fw-bold">
-                                Total:
-                                <span><?php echo formatPriceCRC($total); ?></span>
-                            </li>
-                        </ul>
-                        <div class="d-grid mt-4">
-                            <?php if (!empty($carrito)) : ?>
-                                <a href="checkout.php" class="btn btn-primary btn-lg">Proceder al Pago <i class="bi bi-arrow-right-circle"></i></a>
-                            <?php else : ?>
-                                <button class="btn btn-primary btn-lg">Proceder al Pago</button>
-                            <?php endif; ?>
-                        </div>
-                        <div class="d-grid mt-2">
-                            <a href="index.php" class="btn btn-outline-secondary">Continuar Comprando</a>
-                        </div>
-                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">Resumen</div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between">Subtotal: <span id="subtotal"><?php echo formatPriceCRC($subtotal); ?></span></li>
+                        <li class="list-group-item d-flex justify-content-between">Envío: <span id="envio"><?php echo formatPriceCRC($envio); ?></span></li>
+                        <li class="list-group-item d-flex justify-content-between">Impuestos: <span id="impuesto"><?php echo formatPriceCRC($impuesto); ?></span></li>
+                        <li class="list-group-item d-flex justify-content-between fw-bold">Total: <span id="total"><?php echo formatPriceCRC($total); ?></span></li>
+                    </ul>
+                    <form action="pago.php" method="post" class="d-grid mt-3">
+                        <input type="hidden" name="total" id="total-input" value="<?php echo number_format($total, 2, '.', ''); ?>">
+                        <button type="submit" class="btn btn-primary btn-lg">Proceder al Pago</button>
+                    </form>
+                    <a href="index.php" class="btn btn-outline-secondary mt-2 w-100">Seguir Comprando</a>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
+</main>
 
- <footer class="custom-footer" style="background-color: #AADD22; color: white;">
+<script>
+document.querySelectorAll('.cantidad-input').forEach(input => {
+    input.addEventListener('change', () => {
+        const form = input.closest('.actualizar-cantidad-form');
+        const id = form.getAttribute('data-id');
+        const cantidad = input.value;
+
+        fetch('actualizarCarrito.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+                action: 'actualizar',
+                id_producto: id,
+                cantidad: cantidad
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById(`subtotal-item-${id}`).textContent = data.subtotal_item;
+                document.getElementById('subtotal').textContent = data.subtotal;
+                document.getElementById('impuesto').textContent = data.impuesto;
+                document.getElementById('total').textContent = data.total;
+                document.getElementById('total-input').value = data.total_raw;
+            }
+        });
+    });
+});
+
+document.querySelectorAll('.eliminar-producto').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        if (confirm('¿Eliminar este producto del carrito?')) {
+            fetch('actualizarCarrito.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    action: 'eliminar',
+                    id_producto: id
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                }
+            });
+        }
+    });
+});
+</script>
+<footer class="custom-footer" style="background-color: #AADD22; color: white;">
         <div class="container">
             <div class="row">
                 <div class="col-md-6 text-center text-md-start">
@@ -269,8 +280,6 @@ $total = $subtotal + $impuesto + $envio;
             </div>
         </div>
     </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
