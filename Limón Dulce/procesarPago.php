@@ -45,8 +45,8 @@ $mysqli->begin_transaction();
 
 try {
     // 1. Insertar en tabla `pago`
-$stmt_pago = $mysqli->prepare("INSERT INTO pago (id_usuario, monto, fecha_pago, metodo_pago) VALUES (?, ?, ?, ?)");
-$stmt_pago->bind_param("idss", $idUsuario, $totalCalculado, $fechaPago, $metodoPago);
+    $stmt_pago = $mysqli->prepare("INSERT INTO pago (id_usuario, monto, fecha_pago, metodo_pago) VALUES (?, ?, ?, ?)");
+    $stmt_pago->bind_param("idss", $idUsuario, $totalCalculado, $fechaPago, $metodoPago);
     $stmt_pago->execute();
     $id_pago = $mysqli->insert_id;
     $stmt_pago->close();
@@ -87,6 +87,7 @@ $stmt_pago->bind_param("idss", $idUsuario, $totalCalculado, $fechaPago, $metodoP
     }
 
     // 3. Insertar productos del carrito en tabla `carrito`
+    // Modificado para incluir el id_pago
     foreach ($carrito as $producto) {
         $producto_id = intval($producto['id']);
         $precio = floatval($producto['precio']);
@@ -96,9 +97,9 @@ $stmt_pago->bind_param("idss", $idUsuario, $totalCalculado, $fechaPago, $metodoP
         $envioProd = 2000.00; // Puedes cambiar esto si hay lógica por producto
         $totalProd = $subtotalProd + $impuestoProd + $envioProd;
 
-        $stmtCarrito = $mysqli->prepare("INSERT INTO carrito (usuario_id, producto_id, precio, cantidad, subtotal, impuesto, envio, total)
-                                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmtCarrito->bind_param("iididddd", $idUsuario, $producto_id, $precio, $cantidad, $subtotalProd, $impuestoProd, $envioProd, $totalProd);
+        $stmtCarrito = $mysqli->prepare("INSERT INTO carrito (usuario_id, producto_id, precio, cantidad, subtotal, impuesto, envio, total, id_pago)
+                                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmtCarrito->bind_param("iididdddi", $idUsuario, $producto_id, $precio, $cantidad, $subtotalProd, $impuestoProd, $envioProd, $totalProd, $id_pago);
         $stmtCarrito->execute();
         $stmtCarrito->close();
     }
@@ -117,4 +118,3 @@ $stmt_pago->bind_param("idss", $idUsuario, $totalCalculado, $fechaPago, $metodoP
     $mysqli->rollback();
     die("Ocurrió un error al procesar el pago: " . $e->getMessage());
 }
-?>

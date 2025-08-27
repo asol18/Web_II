@@ -1,4 +1,6 @@
 <?php
+session_start();
+require_once 'conexion.php'; // Asegúrate de que este archivo exista y funcione
 // index.php
 
 // Array de productos con categoría, imagen y descripción
@@ -20,7 +22,7 @@ $categoriaSeleccionada = $_GET['categoria'] ?? '';
 $busqueda = $_GET['busqueda'] ?? '';
 
 // Filtrar productos por categoría y búsqueda
-$productosFiltrados = array_filter($productos, function($producto) use ($categoriaSeleccionada, $busqueda) {
+$productosFiltrados = array_filter($productos, function ($producto) use ($categoriaSeleccionada, $busqueda) {
     $coincideCategoria = $categoriaSeleccionada === '' || strtolower($producto['categoria']) === strtolower($categoriaSeleccionada);
     $coincideBusqueda = $busqueda === '' || stripos($producto['nombre'], $busqueda) !== false || stripos($producto['descripcion'], $busqueda) !== false;
     return $coincideCategoria && $coincideBusqueda;
@@ -42,28 +44,46 @@ $productosFiltrados = array_filter($productos, function($producto) use ($categor
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-secondary custom-navbar">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="index.php">
                 <img src="img/Logo.png" alt="Limón Dulce Logo" width="130px" class="d-inline-block align-text-top" />
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="btn btn-success me-2" href="inicioSesion.php">Iniciar Sesión</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="perfil.php">
-                            <i class="bi bi-person"></i> Perfil
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="carrito.php">
-                            <i class="bi bi-cart"></i> Carrito
-                        </a>
-                    </li>
+                    <?php if (isset($_SESSION['usuario_nombre'])): ?>
+                        <li class="nav-item">
+                            <span class="nav-link">¡Hola, <?php echo htmlspecialchars($_SESSION['usuario_nombre']); ?>!</span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="perfil.php">
+                                <i class="bi bi-person"></i> Perfil
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="carrito.php">
+                                <i class="bi bi-cart"></i> Carrito
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-danger me-2" href="cerrarSesion.php">Cerrar Sesión</a>
+                        </li>
+                    <?php else: ?>
+                        <li class="nav-item">
+                            <a class="btn btn-success me-2" href="inicioSesion.php">Iniciar Sesión</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="perfil.php">
+                                <i class="bi bi-person"></i> Perfil
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="carrito.php">
+                                <i class="bi bi-cart"></i> Carrito
+                            </a>
+                        </li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>
