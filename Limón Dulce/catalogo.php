@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once 'conexion.php';
 
 // Función para formatear el precio en Colón Costarricense (CRC)

@@ -1,21 +1,18 @@
 <?php
 session_start();
-require_once "conexion.php";
-
-// Ya no necesitas el array de productos estático.
-// $productos = [ ... ];
-// Tampoco necesitas los filtros, ya que esta es una vista de administración
-// $busqueda = $_GET['busqueda'] ?? '';
-// $categoriaSeleccionada = $_GET['categoria'] ?? '';
-// $productosFiltrados = array_filter($productos, ...);
-
-
+require_once 'conexion.php';
+// Verificar si el usuario es administrador
+if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] !== 'admin') {
+    header("Location: index.php");
+    exit;
+}
 // Obtener productos de la base de datos, incluyendo la columna de imagen
-$resultado = $mysqli->query("SELECT id, imagen, nombre, categoria, precio, stock FROM productos ORDER BY creado_en DESC");
+$resultado = $mysqli->query("SELECT id, imagen, nombre, categoria, precio, stock FROM productos ORDER BY id DESC");
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Inicio | Admin</title>
@@ -31,6 +28,7 @@ $resultado = $mysqli->query("SELECT id, imagen, nombre, categoria, precio, stock
         }
     </style>
 </head>
+
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-secondary custom-navbar">
         <div class="container-fluid">
@@ -69,58 +67,55 @@ $resultado = $mysqli->query("SELECT id, imagen, nombre, categoria, precio, stock
         </div>
     </nav>
 
-
-<div class="container my-5">
-    <h2 class="mb-4">Gestión de Productos</h2>
-    <div class="mb-3 text-end">
-        <a href="agregarProducto.php" class="btn btn-primary">+ Agregar Producto</a>
-        <a href="index.php" class="btn btn-secondary">Volver al inicio</a>
+    <div class="container my-5">
+        <h2 class="mb-4">Gestión de Productos</h2>
+        <div class="mb-3 text-end">
+            <a href="agregarProducto.php" class="btn btn-primary">+ Agregar Producto</a>
+        </div>
+        <?php if ($resultado->num_rows > 0): ?>
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Imagen</th>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Precio</th>
+                            <th>Stock</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while ($fila = $resultado->fetch_assoc()): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($fila['id']); ?></td>
+                                <td>
+                                    <?php if (!empty($fila['imagen'])): ?>
+                                        <!-- Aquí está la corrección: se usa una ruta absoluta para que la imagen se cargue correctamente -->
+                                        <img src="img/<?php echo htmlspecialchars($fila['imagen']); ?>" class="producto-img" alt="<?php echo htmlspecialchars($fila['nombre']); ?>" />
+                                    <?php else: ?>
+                                        <span class="text-muted">Sin imagen</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td><?php echo htmlspecialchars($fila['nombre']); ?></td>
+                                <td><?php echo htmlspecialchars($fila['categoria']); ?></td>
+                                <td>₡<?php echo number_format($fila['precio'], 3); ?></td>
+                                <td><?php echo htmlspecialchars($fila['stock']); ?></td>
+                                <td>
+                                    <a href="editarProducto.php?id=<?php echo htmlspecialchars($fila['id']); ?>" class="btn btn-sm btn-warning">Editar</a>
+                                    <a href="eliminarProducto.php?id=<?php echo htmlspecialchars($fila['id']); ?>" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de eliminar este producto?')">Eliminar</a>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php else: ?>
+            <div class="alert alert-info text-center">No hay productos registrados.</div>
+        <?php endif; ?>
     </div>
 
-    <?php if ($resultado->num_rows > 0): ?>
-        <div class="table-responsive">
-            <table class="table table-bordered align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Imagen</th>
-                        <th>Nombre</th>
-                        <th>Categoría</th>
-                        <th>Precio</th>
-                        <th>Stock</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php while ($fila = $resultado->fetch_assoc()): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($fila['id']); ?></td>
-                            <td>
-                                <?php if (!empty($fila['imagen'])): ?>
-                                    <!-- Aquí está la corrección: se usa una ruta absoluta para que la imagen se cargue correctamente -->
-                                    <img src="/<?php echo htmlspecialchars($fila['imagen']); ?>" class="producto-img" alt="<?php echo htmlspecialchars($fila['nombre']); ?>" />
-                                <?php else: ?>
-                                    <span class="text-muted">Sin imagen</span>
-                                <?php endif; ?>
-                            </td>
-                            <td><?php echo htmlspecialchars($fila['nombre']); ?></td>
-                            <td><?php echo htmlspecialchars($fila['categoria']); ?></td>
-                            <td>₡<?php echo number_format($fila['precio'], 3); ?></td>
-                            <td><?php echo htmlspecialchars($fila['stock']); ?></td>
-                            <td>
-                                <a href="editarProducto.php?id=<?php echo htmlspecialchars($fila['id']); ?>" class="btn btn-sm btn-warning">Editar</a>
-                                <a href="eliminarProducto.php?id=<?php echo htmlspecialchars($fila['id']); ?>" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de eliminar este producto?')">Eliminar</a>
-                                <a href="reporteVentas.php" class="btn btn-outline-primary">Ver reporte de ventas</a>
-                            </td>
-                        </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
-        </div>
-    <?php else: ?>
-        <div class="alert alert-info text-center">No hay productos registrados.</div>
-    <?php endif; ?>
-</div>
-
 </body>
+
 </html>

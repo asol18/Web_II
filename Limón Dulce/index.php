@@ -19,7 +19,7 @@ $productos = [
 
 // Obtener filtros enviados por GET
 $categoriaSeleccionada = $_GET['categoria'] ?? '';
-$busqueda = $_GET['busqueda'] ?? '';
+$busqueda =trim($_GET['busqueda'] ?? '');
 
 // Filtrar productos por categoría y búsqueda
 $productosFiltrados = array_filter($productos, function ($producto) use ($categoriaSeleccionada, $busqueda) {

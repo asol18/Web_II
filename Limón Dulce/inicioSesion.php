@@ -1,14 +1,13 @@
 <?php
 session_start();
-require_once 'conexion.php'; // Asegúrate de que este archivo exista y funcione.
-
+require_once 'conexion.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $correo = $_POST['correo'];
     $contrasena = $_POST['contraseña'];
 
-    // Aquí deberías validar las credenciales con la base de datos
-    $stmt = $mysqli->prepare("SELECT id, nombre, contraseña FROM usuarios WHERE correo = ?");
+    // Seleccionamos también el rol
+    $stmt = $mysqli->prepare("SELECT id, nombre, contraseña, rol FROM usuarios WHERE correo = ?");
     $stmt->bind_param("s", $correo);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -16,10 +15,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
         if (password_verify($contrasena, $user['contraseña'])) {
-            // Credenciales válidas
+            // Guardamos datos en sesión
             $_SESSION['usuario_id'] = $user['id'];
             $_SESSION['usuario_nombre'] = $user['nombre'];
-            header("Location: index.php");
+            $_SESSION['usuario_rol'] = $user['rol'];
+
+            // Redirección según el rol
+            if ($user['rol'] === 'admin') {
+                header("Location: adminIndex.php");
+            } else {
+                header("Location: index.php");
+            }
             exit;
         } else {
             $error = "Contraseña incorrecta.";
