@@ -115,6 +115,23 @@ $resultado = $mysqli->query("SELECT id, imagen, nombre, categoria, precio, stock
             <div class="alert alert-info text-center">No hay productos registrados.</div>
         <?php endif; ?>
     </div>
+    
+<div class="mb-4">
+    <h4>Generar Reporte de Ventas</h4>
+    <form action="reporteIngresosMes.php" method="get" class="row g-3">
+        <div class="col-md-3">
+            <label for="mes" class="form-label">Mes (1-12)</label>
+            <input type="number" name="mes" id="mes" min="1" max="12" required class="form-control">
+        </div>
+        <div class="col-md-3">
+            <label for="anio" class="form-label">Año</label>
+            <input type="number" name="anio" id="anio" min="2000" max="2100" required class="form-control">
+        </div>
+        <div class="col-md-3 align-self-end">
+            <button type="submit" class="btn btn-success">Descargar CSV</button>
+        </div>
+    </form>
+</div>
 
 </body>
 

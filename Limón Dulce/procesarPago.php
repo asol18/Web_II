@@ -11,6 +11,13 @@ if (!isset($_SESSION['usuario_id'])) {
 
 $idUsuario = $_SESSION['usuario_id'];
 
+//numero de rastreo para agregar a la tabla carrito
+// Obtener el último número de rastreo de la base de datos
+$resultRastreo = $mysqli->query("SELECT MAX(rastreo) AS ultimo_rastreo FROM carrito");
+$rowRastreo = $resultRastreo->fetch_assoc();
+$rastreo = ($rowRastreo['ultimo_rastreo'] ?? 0) + 1;
+
+
 // Validar que hay datos de pago
 if (!isset($_SESSION['pago'])) {
     die("Error: No se encontró la información del pago.");
@@ -96,10 +103,9 @@ try {
         $impuestoProd = $subtotalProd * 0.13;
         $envioProd = 2000.00; // Puedes cambiar esto si hay lógica por producto
         $totalProd = $subtotalProd + $impuestoProd + $envioProd;
-
-        $stmtCarrito = $mysqli->prepare("INSERT INTO carrito (usuario_id, producto_id, precio, cantidad, subtotal, impuesto, envio, total, id_pago)
-                                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmtCarrito->bind_param("iididdddi", $idUsuario, $producto_id, $precio, $cantidad, $subtotalProd, $impuestoProd, $envioProd, $totalProd, $id_pago);
+        $stmtCarrito = $mysqli->prepare("INSERT INTO carrito (usuario_id, producto_id, pago_id, precio, cantidad, subtotal, impuesto, envio, total, rastreo)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmtCarrito->bind_param("iididddddi", $idUsuario, $producto_id, $id_pago, $precio, $cantidad, $subtotalProd, $impuestoProd, $envioProd, $totalProd, $rastreo);
         $stmtCarrito->execute();
         $stmtCarrito->close();
     }
@@ -112,6 +118,8 @@ try {
     unset($_SESSION['carrito']);
 
     // 6. Redirigir
+    session_start();
+    $_SESSION['rastreo'] = $rastreo;
     header("Location: confirmarPago.php?success=1");
     exit;
 } catch (Exception $e) {

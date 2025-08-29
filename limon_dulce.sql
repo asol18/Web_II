@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 27, 2025 at 03:32 AM
+-- Generation Time: Aug 29, 2025 at 01:26 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -21,6 +21,31 @@ SET time_zone = "+00:00";
 -- Database: `limon_dulce`
 --
 
+DELIMITER $$
+--
+-- Procedures
+--
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_ventas_por_mes` (IN `mes` INT, IN `anio` INT)   BEGIN
+    SELECT 
+        p.id_pago,
+        p.fecha_pago,
+        p.metodo_pago,
+        c.producto_id,
+        pr.nombre AS nombre_producto,
+        c.cantidad,
+        c.subtotal,
+        c.impuesto,
+        c.envio,
+        c.total
+    FROM pago p
+    INNER JOIN carrito c ON p.id_pago = c.pago_id
+    INNER JOIN productos pr ON c.producto_id = pr.id
+    WHERE MONTH(p.fecha_pago) = mes AND YEAR(p.fecha_pago) = anio
+    ORDER BY p.fecha_pago;
+END$$
+
+DELIMITER ;
+
 -- --------------------------------------------------------
 
 --
@@ -31,23 +56,30 @@ CREATE TABLE `carrito` (
   `id` int(11) NOT NULL,
   `usuario_id` int(11) NOT NULL,
   `producto_id` int(11) NOT NULL,
+  `pago_id` int(11) NOT NULL,
   `precio` decimal(10,2) NOT NULL DEFAULT 0.00,
   `cantidad` int(11) NOT NULL DEFAULT 1,
   `subtotal` decimal(10,2) NOT NULL DEFAULT 0.00,
   `impuesto` decimal(10,2) NOT NULL DEFAULT 0.00,
   `envio` decimal(10,2) NOT NULL DEFAULT 0.00,
-  `total` decimal(10,2) NOT NULL DEFAULT 0.00
+  `total` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `rastreo` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `carrito`
 --
 
-INSERT INTO `carrito` (`id`, `usuario_id`, `producto_id`, `precio`, `cantidad`, `subtotal`, `impuesto`, `envio`, `total`) VALUES
-(1, 3, 3, 12000.00, 1, 12000.00, 1560.00, 2000.00, 15560.00),
-(2, 3, 7, 44000.00, 1, 44000.00, 5720.00, 2000.00, 51720.00),
-(3, 3, 6, 20800.00, 2, 41600.00, 5408.00, 2000.00, 49008.00),
-(4, 3, 13, 19200.00, 1, 19200.00, 2496.00, 2000.00, 23696.00);
+INSERT INTO `carrito` (`id`, `usuario_id`, `producto_id`, `pago_id`, `precio`, `cantidad`, `subtotal`, `impuesto`, `envio`, `total`, `rastreo`) VALUES
+(1, 3, 3, 4, 12000.00, 1, 12000.00, 1560.00, 2000.00, 15560.00, 1),
+(2, 3, 7, 4, 44000.00, 1, 44000.00, 5720.00, 2000.00, 51720.00, 1),
+(3, 3, 6, 5, 20800.00, 2, 41600.00, 5408.00, 2000.00, 49008.00, 2),
+(4, 3, 13, 5, 19200.00, 1, 19200.00, 2496.00, 2000.00, 23696.00, 2),
+(5, 4, 4, 7, 15200.00, 1, 15200.00, 1976.00, 2000.00, 19176.00, 3),
+(6, 4, 17, 8, 19600.00, 1, 19600.00, 2548.00, 2000.00, 24148.00, 3),
+(7, 4, 9, 9, 19200.00, 1, 19200.00, 2496.00, 2000.00, 23696.00, 4),
+(8, 4, 15, 10, 19200.00, 2, 38400.00, 4992.00, 2000.00, 45392.00, 5),
+(9, 4, 20, 10, 44000.00, 1, 44000.00, 5720.00, 2000.00, 51720.00, 5);
 
 -- --------------------------------------------------------
 
@@ -83,7 +115,11 @@ CREATE TABLE `pago` (
 
 INSERT INTO `pago` (`id_pago`, `id_usuario`, `monto`, `fecha_pago`, `metodo_pago`) VALUES
 (4, 3, 65280, '2025-08-26', 'tarjeta'),
-(5, 3, 70704, '2025-08-26', 'tarjeta');
+(5, 3, 70704, '2025-08-26', 'tarjeta'),
+(7, 4, 19176, '2025-08-29', 'tarjeta'),
+(8, 4, 24148, '2025-08-29', 'sinpe'),
+(9, 4, 23696, '2025-08-29', 'sinpe'),
+(10, 4, 95112, '2025-08-29', 'tarjeta');
 
 -- --------------------------------------------------------
 
@@ -98,6 +134,14 @@ CREATE TABLE `pago_sinpe` (
   `nombre_remitente` varchar(100) NOT NULL,
   `referencia_sinpe` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `pago_sinpe`
+--
+
+INSERT INTO `pago_sinpe` (`id_pago_sinpe`, `id_pago`, `celular_sinpe`, `nombre_remitente`, `referencia_sinpe`) VALUES
+(1, 8, 62168158, 'Ana Arias', 'ACR4579896'),
+(2, 9, 62168158, 'Ana Arias', 'ACR45798100');
 
 -- --------------------------------------------------------
 
@@ -119,7 +163,9 @@ CREATE TABLE `pago_tarjeta` (
 
 INSERT INTO `pago_tarjeta` (`id_pago_tarjeta`, `id_pago`, `ultimos4`, `nombre_titular`, `fecha_expiracion`) VALUES
 (1, 4, '6484', 'Allyson Sequeira', '10/28'),
-(2, 5, '6484', 'Allyson Sequeira', '10/28');
+(2, 5, '6484', 'Allyson Sequeira', '10/28'),
+(4, 7, '7845', 'Ana Arias', '05/29'),
+(5, 10, '7845', 'Ana Arias', '05/29');
 
 -- --------------------------------------------------------
 
@@ -187,7 +233,8 @@ CREATE TABLE `usuarios` (
 
 INSERT INTO `usuarios` (`id`, `nombre`, `correo`, `telefono`, `direccion`, `contraseña`, `rol`, `creado_en`) VALUES
 (1, 'Admin', 'admin@limon.com', '0000', 'Backend', '$2y$10$oXo5FzuBLx3wFTYCONPgEumdeMC2NC0gChVSoVFZ71FWshg4fonCm', 'admin', '2025-08-07 00:57:33'),
-(3, 'Allyson', 'allysequi18@gmail.com', '85296326', 'Gamonales, Ciudad Quesada San Carlos', '$2y$10$6wingZ3vYOgv55K4A4wADuvB9EvlPH7UUQ1MtL9/3Ju.uEr2LrGOO', 'usuario', '2025-08-07 19:44:58');
+(3, 'Allyson', 'allysequi18@gmail.com', '85296326', 'Gamonales, Ciudad Quesada San Carlos', '$2y$10$6wingZ3vYOgv55K4A4wADuvB9EvlPH7UUQ1MtL9/3Ju.uEr2LrGOO', 'usuario', '2025-08-07 19:44:58'),
+(4, 'Ana Maria', 'anamariacampos20@hotmail.com', '62168158', 'Barrio Lourdes', '$2y$10$sEv5gy577Sc2QQUYsV0TjO6/USX.fDUULr5pOWw0.GcrmpZc5B8e.', 'usuario', '2025-08-29 03:20:07');
 
 --
 -- Indexes for dumped tables
@@ -199,7 +246,8 @@ INSERT INTO `usuarios` (`id`, `nombre`, `correo`, `telefono`, `direccion`, `cont
 ALTER TABLE `carrito`
   ADD PRIMARY KEY (`id`),
   ADD KEY `usuario_id` (`usuario_id`),
-  ADD KEY `producto_id` (`producto_id`);
+  ADD KEY `producto_id` (`producto_id`),
+  ADD KEY `id_pago` (`pago_id`);
 
 --
 -- Indexes for table `detalle_pedido`
@@ -251,7 +299,7 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT for table `carrito`
 --
 ALTER TABLE `carrito`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `detalle_pedido`
@@ -263,19 +311,19 @@ ALTER TABLE `detalle_pedido`
 -- AUTO_INCREMENT for table `pago`
 --
 ALTER TABLE `pago`
-  MODIFY `id_pago` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_pago` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `pago_sinpe`
 --
 ALTER TABLE `pago_sinpe`
-  MODIFY `id_pago_sinpe` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_pago_sinpe` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `pago_tarjeta`
 --
 ALTER TABLE `pago_tarjeta`
-  MODIFY `id_pago_tarjeta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_pago_tarjeta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `productos`
@@ -287,7 +335,7 @@ ALTER TABLE `productos`
 -- AUTO_INCREMENT for table `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Constraints for dumped tables
@@ -298,7 +346,8 @@ ALTER TABLE `usuarios`
 --
 ALTER TABLE `carrito`
   ADD CONSTRAINT `carrito_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`),
-  ADD CONSTRAINT `carrito_ibfk_2` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`);
+  ADD CONSTRAINT `carrito_ibfk_2` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`),
+  ADD CONSTRAINT `fk_carrito_pago` FOREIGN KEY (`pago_id`) REFERENCES `pago` (`id_pago`);
 
 --
 -- Constraints for table `detalle_pedido`

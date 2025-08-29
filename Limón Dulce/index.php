@@ -1,7 +1,6 @@
 <?php
 session_start();
-require_once 'conexion.php'; // Asegúrate de que este archivo exista y funcione
-// index.php
+require_once 'conexion.php';
 
 // Array de productos con categoría, imagen y descripción
 $productos = [
@@ -95,24 +94,13 @@ $productosFiltrados = array_filter($productos, function ($producto) use ($catego
 
         <div class="row mb-4">
             <div class="col-md-12">
-                <form class="d-flex justify-content-center" method="GET" action="index.php">
-                    <input class="form-control me-2 w-50" type="search" placeholder="Buscar productos..." aria-label="Search"
-                        name="busqueda" value="<?= htmlspecialchars($busqueda) ?>" />
-                    <select class="form-select me-2 w-auto" aria-label="Filtrar por categoría" name="categoria">
-                        <option value="" <?= $categoriaSeleccionada === '' ? 'selected' : '' ?>>Categoría</option>
-                        <option value="blusas" <?= $categoriaSeleccionada === 'blusas' ? 'selected' : '' ?>>Blusas</option>
-                        <option value="abrigos" <?= $categoriaSeleccionada === 'abrigos' ? 'selected' : '' ?>>Abrigos</option>
-                        <option value="conjuntos" <?= $categoriaSeleccionada === 'conjuntos' ? 'selected' : '' ?>>Conjuntos</option>
-                        <option value="enaguas" <?= $categoriaSeleccionada === 'enaguas' ? 'selected' : '' ?>>Enaguas</option>
-                        <option value="enterizos" <?= $categoriaSeleccionada === 'enterizos' ? 'selected' : '' ?>>Enterizos</option>
-                        <option value="pantalones" <?= $categoriaSeleccionada === 'pantalones' ? 'selected' : '' ?>>Pantalones</option>
-                        <option value="shorts" <?= $categoriaSeleccionada === 'shorts' ? 'selected' : '' ?>>Shorts</option>
-                        <option value="vestidos" <?= $categoriaSeleccionada === 'vestidos' ? 'selected' : '' ?>>Vestidos</option>
-                        <option value="zapatos" <?= $categoriaSeleccionada === 'zapatos' ? 'selected' : '' ?>>Zapatos</option>
-                        <option value="chalecos" <?= $categoriaSeleccionada === 'chalecos' ? 'selected' : '' ?>>Chalecos</option>
-                    </select>
-                    <button class="btn btn-outline-primary" type="submit">Filtrar</button>
-                </form>
+<div class="row mb-4">
+    <div class="col-md-12 text-end">
+        <a href="filtrosProductos.php" class="btn btn-outline-primary">
+            <i class="bi bi-funnel-fill"></i> Filtrar Productos
+        </a>
+    </div>
+</div>
             </div>
         </div>
 
