@@ -2,6 +2,12 @@
 session_start();
 require_once 'conexion.php';
 
+$categorias = [
+    "blusas", "abrigos", "conjuntos", "enaguas",
+    "enterizos", "pantalones", "shorts", "vestidos",
+    "zapatos", "chalecos"
+];
+
 // Obtener filtros desde GET
 $nombre = trim($_GET['nombre'] ?? '');
 $categoria = trim($_GET['categoria'] ?? '');
@@ -148,18 +154,13 @@ $productos = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
         </div>
         <div class="col-md-3">
             <select name="categoria" class="form-select">
-                <option value="">Todas las categorías</option>
-                <option value="blusas" <?= $categoria === 'blusas' ? 'selected' : '' ?>>Blusas</option>
-                <option value="abrigos" <?= $categoria === 'abrigos' ? 'selected' : '' ?>>Abrigos</option>
-                <option value="conjuntos" <?= $categoria === 'conjuntos' ? 'selected' : '' ?>>Conjuntos</option>
-                <option value="enaguas" <?= $categoria === 'enaguas' ? 'selected' : '' ?>>Enaguas</option>
-                <option value="enterizos" <?= $categoria === 'enterizos' ? 'selected' : '' ?>>Enterizos</option>
-                <option value="pantalones" <?= $categoria === 'pantalones' ? 'selected' : '' ?>>Pantalones</option>
-                <option value="shorts" <?= $categoria === 'shorts' ? 'selected' : '' ?>>Shorts</option>
-                <option value="vestidos" <?= $categoria === 'vestidos' ? 'selected' : '' ?>>Vestidos</option>
-                <option value="zapatos" <?= $categoria === 'zapatos' ? 'selected' : '' ?>>Zapatos</option>
-                <option value="chalecos" <?= $categoria === 'chalecos' ? 'selected' : '' ?>>Chalecos</option>
-            </select>
+              <option value="">Todas las categorías</option>
+              <?php foreach ($categorias as $cat): ?>
+                 <option value="<?= $cat ?>" <?= $categoria === $cat ? 'selected' : '' ?>>
+                       <?= ucfirst($cat) ?>
+                       </option>
+                     <?php endforeach; ?>
+                    </select>
         </div>
         <div class="col-md-2">
             <input type="number" step="0.01" name="precio_min" class="form-control" placeholder="Precio mínimo" value="<?= htmlspecialchars($precio_min) ?>">

@@ -189,3 +189,50 @@ body {
     background-color: var(--limon-dulce-verde-oscuro) !important;
     color: var(--limon-dulce-amarillo-pastel) !important;
 }
+
+
+/*Estilos para la pagina de pedidosUsuario */ 
+        .pedido-card {
+            margin-bottom: 2rem;
+            border: 1px solid #ddd;
+            border-radius: 0.4rem;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+        .pedido-header {
+            background-color: #AADD22;
+            color: white;
+            padding: 1rem;
+            border-radius: 0.4rem 0.4rem 0 0;
+        }
+        .producto-item {
+            border-bottom: 1px solid #ddd;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .producto-item:last-child {
+            border-bottom: none;
+        }
+        .producto-imagen {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .producto-detalle {
+            flex-grow: 1;
+        }
+        .producto-cantidad,
+        .producto-precio,
+        .producto-subtotal {
+            min-width: 80px;
+            text-align: center;
+        }
+        .pedido-footer {
+            padding: 1rem;
+            font-weight: 600;
+            text-align: right;
+            background-color: #f7f7f7;
+            border-radius: 0 0 0.4rem 0.4rem;
+        }

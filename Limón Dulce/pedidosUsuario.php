@@ -16,18 +16,20 @@ SELECT
     p.fecha_pago,
     p.monto,
     p.metodo_pago,
-    c.producto_id,
-    c.precio,
-    c.cantidad,
-    c.subtotal,
+    dc.producto_id,
+    dc.precio,
+    dc.cantidad,
+    dc.subtotal,
     prod.nombre,
     prod.imagen
 FROM pago p
 INNER JOIN carrito c ON p.id_pago = c.pago_id
-INNER JOIN productos prod ON c.producto_id = prod.id
+INNER JOIN detalle_carrito dc ON dc.carrito_id = c.id
+INNER JOIN productos prod ON dc.producto_id = prod.id
 WHERE p.id_usuario = ?
-ORDER BY p.fecha_pago DESC, p.id_pago, c.producto_id
+ORDER BY p.fecha_pago DESC, p.id_pago, dc.producto_id
 ";
+
 
 $stmt = $mysqli->prepare($sql);
 $stmt->bind_param("i", $userId);
@@ -68,72 +70,54 @@ $mysqli->close();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="styles.css" />
-    <style>
-        .pedido-card {
-            margin-bottom: 2rem;
-            border: 1px solid #ddd;
-            border-radius: 0.4rem;
-            box-shadow: 0 0 5px rgba(0,0,0,0.1);
-        }
-        .pedido-header {
-            background-color: #AADD22;
-            color: white;
-            padding: 1rem;
-            border-radius: 0.4rem 0.4rem 0 0;
-        }
-        .producto-item {
-            border-bottom: 1px solid #ddd;
-            padding: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        .producto-item:last-child {
-            border-bottom: none;
-        }
-        .producto-imagen {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-        .producto-detalle {
-            flex-grow: 1;
-        }
-        .producto-cantidad,
-        .producto-precio,
-        .producto-subtotal {
-            min-width: 80px;
-            text-align: center;
-        }
-        .pedido-footer {
-            padding: 1rem;
-            font-weight: 600;
-            text-align: right;
-            background-color: #f7f7f7;
-            border-radius: 0 0 0.4rem 0.4rem;
-        }
-    </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light custom-navbar">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="index.php">
-            <img src="img/Logo.png" alt="Limón Dulce Logo" width="100" class="d-inline-block align-text-top" />
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav"
-            aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link" href="perfil.php"><i class="bi bi-person"></i> Perfil</a></li>
-                <li class="nav-item"><a class="nav-link" href="carrito.php"><i class="bi bi-cart"></i> Carrito</a></li>
-                <li class="nav-item"><a class="nav-link" href="cerrarSesion.php"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a></li>
-            </ul>
+ <nav class="navbar navbar-expand-lg navbar-light bg-secondary custom-navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.php">
+                <img src="img/Logo.png" alt="Limón Dulce Logo" width="130px" class="d-inline-block align-text-top" />
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <?php if (isset($_SESSION['usuario_nombre'])): ?>
+                        <li class="nav-item">
+                            <span class="nav-link">¡Hola, <?php echo htmlspecialchars($_SESSION['usuario_nombre']); ?>!</span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="perfil.php">
+                                <i class="bi bi-person"></i> Perfil
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="carrito.php">
+                                <i class="bi bi-cart"></i> Carrito
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-danger me-2" href="cerrarSesion.php">Cerrar Sesión</a>
+                        </li>
+                    <?php else: ?>
+                        <li class="nav-item">
+                            <a class="btn btn-success me-2" href="inicioSesion.php">Iniciar Sesión</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="perfil.php">
+                                <i class="bi bi-person"></i> Perfil
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="carrito.php">
+                                <i class="bi bi-cart"></i> Carrito
+                            </a>
+                        </li>
+                    <?php endif; ?>
+                </ul>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
 <div class="container my-5">
     <h2 class="mb-4">Mis Pedidos</h2>

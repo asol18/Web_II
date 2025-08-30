@@ -116,7 +116,7 @@ $resultado = $mysqli->query("SELECT id, imagen, nombre, categoria, precio, stock
         <?php endif; ?>
     </div>
     
-<div class="mb-4">
+ <div class="container my-5">
     <h4>Generar Reporte de Ventas</h4>
     <form action="reporteIngresosMes.php" method="get" class="row g-3">
         <div class="col-md-3">
